@@ -1,6 +1,8 @@
 @import "./normalize.css";
 
+/*:root -> 获取根元素html*/
 :root {
+  /* 提前定义变量，之后可在css文件中通过var(--color-text)直接使用 */
   --color-text: #666;
   --color-high-text: #ff5777;
   --color-tint: #ff8198;
