@@ -29,11 +29,15 @@ export default {
     }
   },
   created(){
+    //this
     //1.请求多个数据
     getHomeMultidata().then(res=>{
       console.log(res);
-      this.banners = res.data.data.banner.list
-      this.recommends = res.data.data.recommend.list
+      //在函数调用完成数据销毁前先把数据保存下来
+      //this在箭头函数中往上找作用域,这里的this相当于created()中的this,而这个this就是当前组件的对象
+      this.banners = res.data.banner.list
+      this.recommends = res.data.recommend.list
+      console.log(this.banners)
       console.log(this.recommends);
     })
   }
