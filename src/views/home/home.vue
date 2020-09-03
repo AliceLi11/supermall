@@ -62,6 +62,7 @@ import NavBar from "components/common/navbar/NavBar"
 import TabControl from "components/content/tabControl/TabControl"
 
 import {getHomeMultidata} from "network/home"
+import {getHomeGoods} from "network/home"
 
 export default {
   name:"home",
@@ -75,21 +76,49 @@ export default {
   data(){
     return {
       banners:[],
-      recommends:[]
+      recommends:[],
+      goods:{
+        'pop':{"page":0,list:[]},
+        'new':{"page":0,list:[]},
+        'sell':{"page":0,list:[]}
+      }
     }
   },
+  //create()比较特殊，当我们组件一旦创建完就会执行的函数，所以最好只在里面写主要逻辑，至于里面更加详细的处理逻辑写在methods里
   created(){
     //this
     //1.请求多个数据
-    getHomeMultidata().then(res=>{
-      console.log(res);
-      //在函数调用完成数据销毁前先把数据保存下来
-      //this在箭头函数中往上找作用域,这里的this相当于created()中的this,而这个this就是当前组件的对象
-      this.banners = res.data.banner.list
-      this.recommends = res.data.recommend.list
-      console.log(this.banners)
-      console.log(this.recommends);
-    })
+    // getHomeMultidata().then(res=>{
+    //   console.log(res);
+    //   //在函数调用完成数据销毁前先把数据保存下来
+    //   //this在箭头函数中往上找作用域,这里的this相当于created()中的this,而这个this就是当前组件的对象
+    //   this.banners = res.data.banner.list
+    //   this.recommends = res.data.recommend.list
+    //   console.log(this.banners)
+    //   console.log(this.recommends);
+    // }),
+    //1.请求多个数据
+    this.getHomeMultidata();
+    //2.获取商品数据
+    this.getHomeGoods('pop');
+    this.getHomeGoods('new');
+    this.getHomeGoods('sell');
+  },
+  methods:{
+    getHomeMultidata(){
+      getHomeMultidata().then(res=>{
+        this.banners = res.data.banner.list
+        this.recommends = res.data.recommend.list
+      })
+    },
+    //获取商品数据
+    getHomeGoods(type){
+      const page = this.goods[type].page+1;
+      getHomeGoods(type,page).then(res=>{
+        this.goods[type].list.push(...res.data.list);
+        this.goods[type].page += 1;
+      })
+    }
   }
 }
 </script>
