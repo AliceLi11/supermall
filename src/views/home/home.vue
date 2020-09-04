@@ -7,7 +7,9 @@
     </nav-bar>
     <home-recommend-view :recommends="recommends"/>
     <home-feature-view/>
-    <tab-control :titles="['流行','新款','精选']" class="tab-bar"/>
+    <tab-control :titles="['流行','新款','精选']" class="tab-bar" @tabClick="tabClick"/>
+    <!-- 绑定的属性最好简洁，如果有js运算，可以把js运算放在计算属性中 -->
+    <goods-list :goodsList="goodsTypeShow"/>
     <ul>
       <li>列表1</li>
       <li>列表2</li>
@@ -60,6 +62,7 @@ import HomeFeatureView from "views/home/childComps/HomeFeatureView"
 
 import NavBar from "components/common/navbar/NavBar"
 import TabControl from "components/content/tabControl/TabControl"
+import GoodsList from "components/content/goods/GoodsList"
 
 import {getHomeMultidata} from "network/home"
 import {getHomeGoods} from "network/home"
@@ -71,7 +74,8 @@ export default {
     HomeRecommendView,
     HomeFeatureView,
     NavBar,
-    TabControl
+    TabControl,
+    GoodsList
   },
   data(){
     return {
@@ -81,7 +85,8 @@ export default {
         'pop':{"page":0,list:[]},
         'new':{"page":0,list:[]},
         'sell':{"page":0,list:[]}
-      }
+      },
+      currType:'pop'
     }
   },
   //create()比较特殊，当我们组件一旦创建完就会执行的函数，所以最好只在里面写主要逻辑，至于里面更加详细的处理逻辑写在methods里
@@ -105,6 +110,32 @@ export default {
     this.getHomeGoods('sell');
   },
   methods:{
+    /**
+     * 事件监听相关的方法
+     */
+    tabClick(index){
+      //自己写的方法，感觉比老师写的方法好
+      this.currType = Object.keys(this.goods)[index];
+      /*
+      老师写的方法
+      switch(index){
+        case 0:
+          this.currType='pop';
+          break;
+        case 1:
+          this.currType='new';
+          break;
+        case 2:
+          this.currType='sell';
+          break;
+      }
+      */
+
+    },
+
+    /**
+     * 网络请求相关的方法
+     */
     getHomeMultidata(){
       getHomeMultidata().then(res=>{
         this.banners = res.data.banner.list
@@ -118,6 +149,11 @@ export default {
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page += 1;
       })
+    }
+  },
+  computed:{
+    goodsTypeShow(){
+      return this.goods[this.currType].list
     }
   }
 }
@@ -139,5 +175,6 @@ export default {
   .tab-bar{
     position:sticky;
     top: 44px;
+    z-index: 9;
   }
 </style>
