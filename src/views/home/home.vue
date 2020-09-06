@@ -5,53 +5,14 @@
         <p>购物街</p>
       </template>
     </nav-bar>
-    <home-recommend-view :recommends="recommends"/>
-    <home-feature-view/>
-    <tab-control :titles="['流行','新款','精选']" class="tab-bar" @tabClick="tabClick"/>
-    <!-- 绑定的属性最好简洁，如果有js运算，可以把js运算放在计算属性中 -->
-    <goods-list :goodsList="goodsTypeShow"/>
-    <ul>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-       <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-    </ul>
+    <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll" :pullUpLoad="true" @pullingUp="contentPullUp">
+      <home-recommend-view :recommends="recommends"/>
+      <home-feature-view/>
+      <tab-control :titles="['流行','新款','精选']" class="tab-bar" @tabClick="tabClick"/>
+      <!-- 绑定的属性最好简洁，如果有js运算，可以把js运算放在计算属性中 -->
+      <goods-list :goodsList="goodsTypeShow"/>
+    </scroll>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -61,8 +22,10 @@ import HomeRecommendView from "views/home/childComps/HomeRecommendView"
 import HomeFeatureView from "views/home/childComps/HomeFeatureView"
 
 import NavBar from "components/common/navbar/NavBar"
+import Scroll from "components/common/scroll/Scroll"
 import TabControl from "components/content/tabControl/TabControl"
 import GoodsList from "components/content/goods/GoodsList"
+import BackTop from "components/content/backTop/BackTop"
 
 import {getHomeMultidata} from "network/home"
 import {getHomeGoods} from "network/home"
@@ -74,8 +37,10 @@ export default {
     HomeRecommendView,
     HomeFeatureView,
     NavBar,
+    Scroll,
     TabControl,
-    GoodsList
+    GoodsList,
+    BackTop
   },
   data(){
     return {
@@ -86,7 +51,8 @@ export default {
         'new':{"page":0,list:[]},
         'sell':{"page":0,list:[]}
       },
-      currType:'pop'
+      currType:'pop',
+      isShowBackTop:false
     }
   },
   //create()比较特殊，当我们组件一旦创建完就会执行的函数，所以最好只在里面写主要逻辑，至于里面更加详细的处理逻辑写在methods里
@@ -109,10 +75,37 @@ export default {
     this.getHomeGoods('new');
     this.getHomeGoods('sell');
   },
+  mounted(){
+    //3.监听item中图片加载完成,完成之后触发better-scroll插件的refresh函数
+    const refresh = this.debounce(this.$refs.scroll.refresh,500);
+    this.$bus.$on('itemImgLoaded',()=>{
+      /**
+       * 防抖函数起作用的过程：
+       * ·如果我们直接执行refresh,namerefresh函数会被执行图片加载总数的次数
+       * ·可以将refresh函数传入到debounce函数中，生成一个新的函数
+       * ·之后在调用非常频繁的时候，就使用新生成的函数
+       * ·而新生成的函数，并不会非常频繁的调用，如果下一次执行来的非常快，那么会将上一次取消掉
+       */
+      // this.$refs.scroll.refresh();
+      refresh();
+    })
+  },
   methods:{
     /**
      * 事件监听相关的方法
      */
+    //防抖动函数
+    debounce(fn,delay){
+      let timer = null;
+      return function(...args){
+        if(timer){
+          clearTimeout(timer);
+        }
+        timer = setTimeout(()=>{
+          fn.apply(this,args)
+        },delay)
+      }
+    },
     tabClick(index){
       //自己写的方法，感觉比老师写的方法好
       this.currType = Object.keys(this.goods)[index];
@@ -132,6 +125,18 @@ export default {
       */
 
     },
+    backClick(){
+      //可以获取到Scroll组件，并拿到Scroll组件里的信息
+      this.$refs.scroll.scrollTo(0,0);
+      console.log("点击了backtop")
+    },
+    contentScroll(position){
+      this.isShowBackTop = (-position.y)>3000
+    },
+    contentPullUp(){
+      console.log("上拉加载");
+      this.getHomeGoods(this.currType);
+    },
 
     /**
      * 网络请求相关的方法
@@ -148,6 +153,9 @@ export default {
       getHomeGoods(type,page).then(res=>{
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page += 1;
+        //结束上拉加载行为。每次触发 pullingUp 钩子后，等数据请求完成，并且将新的数据展示出来后,你应该主动调用 finishPullUp() 告诉 BetterScroll 准备好下一次的 pullingUp 钩子。
+        //这里的finishPullUp()是在scroll组件里写的一个方法，里面封装了this.scroll.finshPullUp()
+        this.$refs.scroll.finishPullUp();
       })
     }
   },
@@ -159,9 +167,21 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   #home{
     padding-top: 44px;
+    height: 100vh;
+    position: relative;
+  }
+  .content{
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    /* background: #fff; 
+    height: calc(100vh - 93px)*/
   }
   .home-nav{
     background: var(--color-tint);

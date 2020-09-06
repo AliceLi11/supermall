@@ -2,7 +2,9 @@
     <div class="wrap" ref="wrap">
       <div class="content">
         <ul>
+          <!-- 1.无论是否设置click:false,button都可以点击 -->
           <!-- <input type="button" value="点击" @click="btnClick"> -->
+          <!-- 2.必须设置click:true,那么div才能监听点击 -->
           <div @click="btnClick">111</div>
           <li>列表1</li>
           <li>列表2</li>
@@ -115,6 +117,7 @@
 */ 
   import BScroll from "@better-scroll/core"
   import Pullup from '@better-scroll/pull-up'
+  BScroll.use(Pullup);
   export default {
     name:"category",
     data(){
@@ -124,9 +127,9 @@
     },
     mounted(){
       this.scroll = new BScroll(this.$refs.wrap,{
-        click:true,//如果是button的话，设置为false也能点击，但是其他普通元素，我这里用了个div，此属性必须设置为true才能触发事件
+        click:true,//如果是button的话，设置为false也能点击，但是其他普通元素此属性必须设置为true才能触发事件
         probeType:3,//实时监听滚动位置
-        pullUpLoad:true//开启上拉下载
+        pullUpLoad:true//开启上拉加载,测试发现，如果开启了上拉加载，就会实时监听滚动位置
       }),
        
       // 默认情况下BeScroll是不会实时监听滚动位置，所以要加个probeType属性，这个属性值有0/1/2/3
@@ -134,13 +137,14 @@
         console.log(position)
       })
 
-      BScroll.use(Pullup);
       this.scroll.on('pullingUp',()=>{
         console.log("上拉加载更多");
         //发送网络请求，请求更多页的数据
 
         //等数据请求完成，并且将新的数据展示出来后
         setTimeout(()=>{
+          //结束上拉加载行为。每次触发 pullingUp 钩子后，你应该主动调用 finishPullUp() 告诉 BetterScroll 准备好下一次的 pullingUp 钩子。
+          //箭头函数可以让setTimeout里面的this，绑定定义时所在的作用域，而不是指向运行时所在的作用域。如果这里是普通函数，this指向的是window
           this.scroll.finishPullUp()
         },3000)
       })
@@ -157,6 +161,6 @@
   .wrap{
     height: 150px;
     background: seagreen;
-    overflow: hidden;
+    /* overflow: hidden; */
   }
 </style>
