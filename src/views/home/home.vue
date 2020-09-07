@@ -5,10 +5,11 @@
         <p>购物街</p>
       </template>
     </nav-bar>
+    <!-- <tab-control :titles="['流行','新款','精选']" class="tab-control" @tabClick="tabClick" v-show="isTabFixed"/> -->
     <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll" :pullUpLoad="true" @pullingUp="contentPullUp">
       <home-recommend-view :recommends="recommends"/>
       <home-feature-view/>
-      <tab-control :titles="['流行','新款','精选']" class="tab-bar" @tabClick="tabClick"/>
+      <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick"/>
       <!-- 绑定的属性最好简洁，如果有js运算，可以把js运算放在计算属性中 -->
       <goods-list :goodsList="goodsTypeShow"/>
     </scroll>
@@ -27,8 +28,8 @@ import TabControl from "components/content/tabControl/TabControl"
 import GoodsList from "components/content/goods/GoodsList"
 import BackTop from "components/content/backTop/BackTop"
 
-import {getHomeMultidata} from "network/home"
-import {getHomeGoods} from "network/home"
+import {getHomeMultidata,getHomeGoods} from "network/home"
+import {debounce} from "common/utils.js"
 
 export default {
   name:"home",
@@ -52,7 +53,9 @@ export default {
         'sell':{"page":0,list:[]}
       },
       currType:'pop',
-      isShowBackTop:false
+      isShowBackTop:false,
+      saveY:0
+      // isTabFixed:false,
     }
   },
   //create()比较特殊，当我们组件一旦创建完就会执行的函数，所以最好只在里面写主要逻辑，至于里面更加详细的处理逻辑写在methods里
@@ -76,8 +79,8 @@ export default {
     this.getHomeGoods('sell');
   },
   mounted(){
-    //3.监听item中图片加载完成,完成之后触发better-scroll插件的refresh函数
-    const refresh = this.debounce(this.$refs.scroll.refresh,500);
+    //1.监听item中图片加载完成,完成之后触发better-scroll插件的refresh函数
+    const refresh = debounce(this.$refs.scroll.refresh,500);
     this.$bus.$on('itemImgLoaded',()=>{
       /**
        * 防抖函数起作用的过程：
@@ -89,23 +92,12 @@ export default {
       // this.$refs.scroll.refresh();
       refresh();
     })
+    //2.获取tabControl的offsetTop
   },
   methods:{
     /**
      * 事件监听相关的方法
      */
-    //防抖动函数
-    debounce(fn,delay){
-      let timer = null;
-      return function(...args){
-        if(timer){
-          clearTimeout(timer);
-        }
-        timer = setTimeout(()=>{
-          fn.apply(this,args)
-        },delay)
-      }
-    },
     tabClick(index){
       //自己写的方法，感觉比老师写的方法好
       this.currType = Object.keys(this.goods)[index];
@@ -123,7 +115,6 @@ export default {
           break;
       }
       */
-
     },
     backClick(){
       //可以获取到Scroll组件，并拿到Scroll组件里的信息
@@ -163,13 +154,22 @@ export default {
     goodsTypeShow(){
       return this.goods[this.currType].list
     }
-  }
+  },
+  activated(){
+    //老师这行是加在后面的，偶发性来回点的时候，会跳到顶部。放在上面之后，暂时没看到这个bug。
+    //其实如果没用better-scroll，可以直接用keep-alive记住位置。bs导致要人为去记住位置。方案：
+    //离开时，即deactived保存一个位置信息saveY,进来时，将位置设置未原来保存的位置saveY即可。
+    this.$refs.scroll.refresh();
+    this.$refs.scroll.scrollTo(0,this.saveY,0);
+  },
+  deactivated(){
+    this.saveY = this.$refs.scroll.getScrollY();
+  },
 }
 </script>
 
 <style scoped>
   #home{
-    padding-top: 44px;
     height: 100vh;
     position: relative;
   }
@@ -183,18 +183,19 @@ export default {
     /* background: #fff; 
     height: calc(100vh - 93px)*/
   }
+  .tab-control{
+    position: relative;
+    z-index: 9;
+  }
   .home-nav{
     background: var(--color-tint);
     color: white;
-    position: fixed;
+    /* 在使用浏览器原生滚动时，为了让导航不跟随一起滚动 */
+    /* position: fixed;
     left: 0;
     right: 0;
     top: 0;
-    z-index: 9;
+    z-index: 9; */
   }
-  .tab-bar{
-    position:sticky;
-    top: 44px;
-    z-index: 9;
-  }
+  
 </style>

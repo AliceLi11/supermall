@@ -6,6 +6,7 @@ const Home = () => import("views/home/Home.vue")
 const Category = () => import("views/category/Category.vue") 
 const Cart = () => import("views/cart/Cart.vue") 
 const Profile = () => import("views/profile/Profile.vue")
+const Detail = () => import("views/detail/Detail.vue")
 
 //1.通过Vue.use(插件)，安装插件(只要是vue的插件，都要使用这个安装功能。内部是实行VueRouter.install这个方法)
 Vue.use(VueRouter)
@@ -30,6 +31,10 @@ const routes = [
     {
         path:"/profile",
         component:Profile
+    },
+    {
+      path:"/detail/:id",
+      component:Detail
     }
 ]
 const router = new VueRouter({
