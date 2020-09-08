@@ -1,27 +1,30 @@
 <template>
   <div>
     <detail-nav-bar></detail-nav-bar>
+    <detail-base-info :goods="goods"></detail-base-info>
   </div>
 </template>
 
 <script>
 import DetailNavBar from "views/detail/detailChildren/DetailNavBar"
+import DetailBaseInfo from "views/detail/detailChildren/DetailBaseInfo"
 
 import {getDetails,Goods} from "network/detail"
 export default {
   name:"Detail",
   components:{
-    DetailNavBar
+    DetailNavBar,
+    DetailBaseInfo
   },
   data(){
     return{
       id:null,
-      goods:null
+      goods:{}
     }
   },
   created(){
     //1.保存传入的iid
-    this.id = this.$route.params.id;
+    this.id = this.$route.params.id; 
     //2.根据iid请求详情数据
     getDetails(this.id).then(res=>{
       console.log(res);
