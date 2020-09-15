@@ -18,7 +18,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .cart-nav{
   background: var(--color-tint);
   color: white;

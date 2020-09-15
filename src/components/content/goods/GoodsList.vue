@@ -22,7 +22,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   .good-list{
     display: flex;
     /* 换行，要想设置一行排几个就换行，就得给子元素.good-list-item设置宽度，这里设置了46% */

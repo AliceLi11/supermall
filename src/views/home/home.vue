@@ -7,6 +7,7 @@
     </nav-bar>
     <!-- <tab-control :titles="['流行','新款','精选']" class="tab-control" @tabClick="tabClick" v-show="isTabFixed"/> -->
     <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll" :pullUpLoad="true" @pullingUp="contentPullUp">
+      <home-swiper :banners="banners"></home-swiper>
       <home-recommend-view :recommends="recommends"/>
       <home-feature-view/>
       <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick"/>
@@ -19,6 +20,7 @@
 
 <script>
 // 代码的导入也要有规范，有利于后期管理。区分开相对不同的导入位置
+import HomeSwiper from "views/home/childComps/HomeSwiper"
 import HomeRecommendView from "views/home/childComps/HomeRecommendView"
 import HomeFeatureView from "views/home/childComps/HomeFeatureView"
 
@@ -35,6 +37,7 @@ export default {
   name:"home",
   components:{
     //组件注册的顺序和导入顺序一致
+    HomeSwiper,
     HomeRecommendView,
     HomeFeatureView,
     NavBar,

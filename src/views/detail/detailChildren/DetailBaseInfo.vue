@@ -1,4 +1,5 @@
 <template>
+  <!-- 如果是goods是空的对象，不渲染 -->
   <div class="base-info" v-if="Object.keys(goods).length !== 0">
       <div class="info-title">
           {{goods.title}}
@@ -14,8 +15,8 @@
           <span>{{goods.services[goods.columns.length-1].name}}</span>
       </div>
       <div class="info-service">
-          <span class="info-service-item" v-for="index in goods.services.length" :key="index">
-            <img :src="goods.services[index-1].icon">
+          <span class="info-service-item" v-for="index in goods.services.length-1" :key="index">
+            <img :src="goods.services[index].icon" style="width:10px">
             <span>{{goods.services[index-1].name}}</span>
         </span>
       </div>
