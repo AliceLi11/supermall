@@ -16,7 +16,10 @@
 export default {
     name:"TabBarItem",
     props:{
-        path:String,
+        link:{
+          type:String,
+          required
+        },
         activeColor:{
             type:String,
             default:"blue"
@@ -29,7 +32,7 @@ export default {
     },
     computed:{
         isActive(){
-            return this.$route.path.indexOf(this.path) !== -1
+            return this.$route.path.indexOf(this.link) !== -1
         },
         isActiveColor(){
             return this.isActive?{color:this.activeColor}:{}

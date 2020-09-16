@@ -2,9 +2,11 @@
   <div class="goods-list-item" @click="goodsItemClick">
     <img :src="goodsItem.show.img" alt="" @load="loadedImg">
     <div>
-      <p>{{goodsItem.title}}</p>
-      <span>{{goodsItem.price}}</span>
-      <span>{{goodsItem.cfav}}</span>
+      <p class="goodsitem-title">{{goodsItem.title}}</p>
+      <p class="goodsitem-others">
+        <span class="goodsitem-price">{{goodsItem.price}}</span>
+        <span class="goodsitem-cfav">{{goodsItem.cfav}}</span>
+      </p>
     </div>
   </div>
 </template>
@@ -40,5 +42,23 @@ export default {
 <style>
   .goods-list-item{
     width: 46%;
+  }
+  .goodsitem-title{
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    margin-top: 5px;
+  }
+  .goodsitem-others{
+    text-align: center;
+  }
+  .goodsitem-price{
+    color:var(--color-tint);
+    font-size: 12px;
+  }
+  .goodsitem-cfav{
+    font-size: 12px;
   }
 </style>
