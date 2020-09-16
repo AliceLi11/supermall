@@ -18,11 +18,11 @@ export default {
     props:{
         link:{
           type:String,
-          required
+          required:true
         },
         activeColor:{
             type:String,
-            default:"blue"
+            default:"deeppink"
         }
     },
     data(){
@@ -40,8 +40,8 @@ export default {
     },
     methods:{
         itemClick(){
-            if(this.$route.path!==this.path){
-                this.$router.replace(this.path)
+            if(this.$route.path!==this.link){
+                this.$router.replace(this.link)
             }
         }
     }

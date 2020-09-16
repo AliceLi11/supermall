@@ -4,7 +4,7 @@
     <div>
       <p class="goodsitem-title">{{goodsItem.title}}</p>
       <p class="goodsitem-others">
-        <span class="goodsitem-price">{{goodsItem.price}}</span>
+        <span class="goodsitem-price">¥{{goodsItem.price}}</span>
         <span class="goodsitem-cfav">{{goodsItem.cfav}}</span>
       </p>
     </div>
@@ -53,12 +53,24 @@ export default {
   }
   .goodsitem-others{
     text-align: center;
+    margin-bottom: 10px;
   }
   .goodsitem-price{
     color:var(--color-tint);
     font-size: 12px;
+    margin-right: 20px;
   }
   .goodsitem-cfav{
     font-size: 12px;
+    position: relative;
+  }
+  .goodsitem-cfav::before{
+    content:'';
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    background: url("~assets/img/common/collect.svg") 0 0/14px 14px;
   }
 </style>

@@ -2,7 +2,7 @@
   <div id="detail">
     <detail-nav-bar></detail-nav-bar>
     <scroll class="content">
-      <img src="~assets/img/home/recommend_bg.jpg" alt="" width="100%" style="border:1px solid #ccc">
+      <detail-swiper :top-imgs="topImgs"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shop"/>
       <detail-goods-info :detail-info="detailInfo"></detail-goods-info>
@@ -12,6 +12,7 @@
 
 <script>
 import DetailNavBar from "views/detail/detailChildren/DetailNavBar"
+import DetailSwiper from "views/detail/detailChildren/DetailSwiper"
 import DetailBaseInfo from "views/detail/detailChildren/DetailBaseInfo"
 import DetailShopInfo from "views/detail/detailChildren/DetailShopInfo"
 import DetailGoodsInfo from "views/detail/detailChildren/DetailGoodsInfo"
@@ -23,6 +24,7 @@ export default {
   name:"Detail",
   components:{
     DetailNavBar,
+    DetailSwiper,
     DetailBaseInfo,
     DetailShopInfo,
     DetailGoodsInfo,
@@ -31,6 +33,7 @@ export default {
   data(){
     return{
       id:null,
+      topImgs:[],
       goods:{},
       shop:{},
       detailInfo:{}
@@ -43,7 +46,8 @@ export default {
     getDetails(this.id).then(res=>{
       console.log(res);
       const data = res.result;
-      //1.获取图顶部图片轮播数据(先搁置)
+      //1.获取图顶部图片轮播数据
+      this.topImgs = data.itemInfo.topImages;
       
       //2.获取商品信息
       this.goods = new Goods(data.itemInfo,data.columns,data.shopInfo.services);
