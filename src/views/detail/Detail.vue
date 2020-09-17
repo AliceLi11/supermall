@@ -45,8 +45,9 @@ export default {
     //2.根据iid请求详情数据
     getDetails(this.id).then(res=>{
       console.log(res);
+      //获取结果
       const data = res.result;
-      //1.获取图顶部图片轮播数据
+      //1.获取顶部图片轮播数据
       this.topImgs = data.itemInfo.topImages;
       
       //2.获取商品信息
@@ -70,13 +71,8 @@ export default {
     background: #fff;
   }
   .content{
-    /* height: calc(100% - 44px);
-    overflow: hidden; */
     position: absolute;
     top: 44px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    overflow: hidden;
+    bottom:60px;
   }
 </style>
