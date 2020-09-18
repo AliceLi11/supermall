@@ -43,9 +43,14 @@ export default {
 </script>
 
 <style scoped>
+ .detail-navbar {
+    background-color: #fff;
+    font-weight: normal;
+  }
   .title{
     display: flex;
     font-size: 13px;
+    padding: 0 20px;
   }
   .title-item{
     flex:1;

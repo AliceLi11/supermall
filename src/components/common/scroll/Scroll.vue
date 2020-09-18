@@ -68,7 +68,6 @@ export default {
         },
         // 重新计算content高度
         refresh(){
-            //通过这个输出可以知道用了防抖动函数之后，这个函数被调用了几次
             this.scroll && this.scroll.refresh && this.scroll.refresh();
         },
         getScrollY(){
