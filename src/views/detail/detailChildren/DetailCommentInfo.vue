@@ -12,7 +12,7 @@
     <div class="comment-detail">
       <p class="detail-txt">{{commentInfo.content}}</p>
       <div class="detail-other">
-        <span class="detail-date">{{commentInfo.created}}</span>
+        <span class="detail-date">{{commentInfo.created | showDate}}</span>
         <span>{{commentInfo.style}}</span>
       </div>
       <div class="detail-images" v-if="commentInfo.images && commentInfo.images.length!==0">
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import {formatDate} from "@/common/utils"
 export default {
   name:"DetailCommentInfo",
   props:{
@@ -31,6 +32,12 @@ export default {
       default(){
         return {}
       }
+    }
+  },
+  filters:{
+    showDate(value){
+      let date = new Date(value*1000);
+      return formatDate(date,'yyyy-MM-dd')
     }
   }
 }
