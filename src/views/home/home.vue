@@ -5,12 +5,12 @@
         <p>购物街</p>
       </template>
     </nav-bar>
-    <!-- <tab-control :titles="['流行','新款','精选']" class="tab-control" @tabClick="tabClick" v-show="isTabFixed"/> -->
+    <tab-control :titles="['流行','新款','精选']" class="tab-control" @tabClick="tabClick" v-show="isTabFixed" ref="topTabControl"/>
     <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll" :pullUpLoad="true" @pullingUp="contentPullUp">
       <home-swiper :banners="banners"></home-swiper>
       <home-recommend-view :recommends="recommends"/>
       <home-feature-view/>
-      <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick"/>
+      <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick" ref="tabControl"/>
       <!-- 绑定的属性最好简洁，如果有js运算，可以把js运算放在计算属性中 -->
       <goods-list :goodsList="goodsTypeShow"/>
     </scroll>
@@ -31,8 +31,7 @@ import GoodsList from "components/content/goods/GoodsList"
 import BackTop from "components/content/backTop/BackTop"
 
 import {getHomeMultidata,getHomeGoods} from "network/home"
-import {debounce} from "common/utils.js"
-
+import {itemListenerMixin} from "common/mixin"
 export default {
   name:"home",
   components:{
@@ -46,6 +45,7 @@ export default {
     GoodsList,
     BackTop
   },
+  mixins:[itemListenerMixin],
   data(){
     return {
       banners:[],
@@ -57,8 +57,9 @@ export default {
       },
       currType:'pop',
       isShowBackTop:false,
-      saveY:0
-      // isTabFixed:false,
+      saveY:0,
+      isTabFixed:false,
+      tabOffsetTop:0
     }
   },
   //create()比较特殊，当我们组件一旦创建完就会执行的函数，所以最好只在里面写主要逻辑，至于里面更加详细的处理逻辑写在methods里
@@ -81,21 +82,9 @@ export default {
     this.getHomeGoods('new');
     this.getHomeGoods('sell');
   },
-  mounted(){
-    //1.监听item中图片加载完成,完成之后触发better-scroll插件的refresh函数
-    const refresh = debounce(this.$refs.scroll.refresh,500);
-    this.$bus.$on('itemImgLoaded',()=>{
-      /**
-       * 防抖函数起作用的过程：
-       * ·如果我们直接执行refresh,namerefresh函数会被执行图片加载总数的次数
-       * ·可以将refresh函数传入到debounce函数中，生成一个新的函数
-       * ·之后在调用非常频繁的时候，就使用新生成的函数
-       * ·而新生成的函数，并不会非常频繁的调用，如果下一次执行来的非常快，那么会将上一次取消掉
-       */
-      // this.$refs.scroll.refresh();
-      refresh();
-    })
-    //2.获取tabControl的offsetTop
+  updated() {
+    // this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop
+    // console.log(this.tabOffsetTop);
   },
   methods:{
     /**
@@ -118,6 +107,9 @@ export default {
           break;
       }
       */
+     //让两个TabControl的curIndex保持一致
+     this.$refs.topTabControl.curIndex = index;
+     this.$refs.tabControl.curIndex = index;
     },
     backClick(){
       //可以获取到Scroll组件，并拿到Scroll组件里的信息
@@ -125,6 +117,11 @@ export default {
       console.log("点击了backtop")
     },
     contentScroll(position){
+      //1.决定tabFixed是否显示
+      // console.log('-----------------++'+position.y);
+      // console.log(-this.tabOffsetTop);
+      this.isTabFixed = position.y < -this.tabOffsetTop
+      //2.决定backTop是否显示
       this.isShowBackTop = (-position.y)>3000
     },
     contentPullUp(){
@@ -139,6 +136,10 @@ export default {
       getHomeMultidata().then(res=>{
         this.banners = res.data.banner.list
         this.recommends = res.data.recommend.list
+        //下次更新DOM时，获取新的tabOffsetTop值（不保险，可以在updated钩子中获取）
+        this.$nextTick(()=>{
+          this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop
+        })
       })
     },
     //获取商品数据
@@ -166,7 +167,10 @@ export default {
     this.$refs.scroll.scrollTo(0,this.saveY,0);
   },
   deactivated(){
+    //保存y值
     this.saveY = this.$refs.scroll.getScrollY();
+    //取消全局事件的监听，不能只传一个事件，一定要把监听的函数也加上，不然所有监听了这个事件的地方全被取消了
+    this.$bus.$off('itemImgLoaded',this.itemImgListener)
   },
 }
 </script>

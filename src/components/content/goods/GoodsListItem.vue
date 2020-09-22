@@ -1,6 +1,6 @@
 <template>
   <div class="goods-list-item" @click="goodsItemClick">
-    <img :src="goodsItem.show.img" alt="" @load="loadedImg">
+    <img :src="showImage" alt="" @load="loadedImg">
     <div>
       <p class="goodsitem-title">{{goodsItem.title}}</p>
       <p class="goodsitem-others">
@@ -22,6 +22,11 @@ export default {
       }
     }
   },
+  computed:{
+    showImage(){
+      return this.goodsItem.image || this.goodsItem.show.img
+    }
+  },
   methods:{
     //加载完图片
     /*这里用了事件总线的方法
@@ -30,10 +35,21 @@ export default {
     * 3.单上面2步的话，其实this.$bus是空的，所以要在入口文件在原型上给$bus赋值 Vue.prototype.$bus = new Vue()    
     */
     loadedImg(){
+      //方案1，首页离开的时候，就不再监听这个事件，所以Home页面有设置
       this.$bus.$emit("itemImgLoaded");
+      //方案2，不同页面设置不同的监听名
+      // if(this.$route.path.indexOf('/home')){
+      //   this.$bus.$emit("homeImgLoaded");
+      // }else if(this.$route.path.indexOf('/detail')){
+      //   this.$bus.$emit("detailItemImgLoaded");
+      // }
     },
     goodsItemClick(){
-      this.$router.push("/detail/"+this.goodsItem.iid);
+      if(this.$route.path.indexOf('/home')!==-1){
+        this.$router.push("/detail/"+this.goodsItem.iid);
+      }else{
+        return false;
+      }
     }
   }
 }

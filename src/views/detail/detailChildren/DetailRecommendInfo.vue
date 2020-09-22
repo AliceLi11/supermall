@@ -1,6 +1,5 @@
 <template>
   <div class="recommend-info">
-    {{recommendList}}
     <goods-list :goods-list="recommendList"></goods-list>
   </div>
 </template>
