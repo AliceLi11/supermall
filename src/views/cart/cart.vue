@@ -1,10 +1,10 @@
 <template>
   <div id="cart">
-    <NavBar class="cart-nav">
+    <nav-bar class="cart-nav">
       <template v-slot:center>
         <p>购物车</p>
       </template>
-    </NavBar>
+    </nav-bar>
   </div>
 </template>
 

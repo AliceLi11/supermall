@@ -8,7 +8,7 @@
       </template>
       <template v-slot:center>
         <div class="title">
-          <div v-for="(item,index) in titles" :key="index" class="title-item" :class="{ativeTitle:index===curIndex}" @click="titleClick(index)">
+          <div v-for="(item,index) in titles" :key="index" class="title-item" :class="{ativeTitle:index===currentIndex}" @click="itemClick(index)">
             {{item}}
           </div>
         </div>
@@ -24,15 +24,20 @@ export default {
   components:{
     NavBar
   },
+  props:{
+    currentIndex:{
+      type:Number,
+      default:0
+    }
+  },
   data(){
     return {
-      titles:['商品','参数','评论','推荐'],
-      curIndex:0
+      titles:['商品','参数','评论','推荐']
     }
   },
   methods:{
-    titleClick(index){
-      this.curIndex = index;
+    itemClick(index){
+      this.$emit('itemClick', index)
     },
     backClick(){
       //this.$router.go(-1) 相当于 this.$router.back()

@@ -5,15 +5,21 @@
       <router-view/>
     </keep-alive>
     <main-tab-bar></main-tab-bar>
+    <icon></icon>
+    <svg-icon></svg-icon>
   </div>
 </template>
 
 <script>
 import MainTabBar from "components/content/mainTabbar/MainTabBar"
+import Icon from 'components/content/icon/Icon.vue'
+import SvgIcon from 'components/content/icon/svg.vue'
 export default {
   name: 'App',
   components:{
-    MainTabBar
+    MainTabBar,
+    Icon,
+    SvgIcon
   }
 }
 </script>
