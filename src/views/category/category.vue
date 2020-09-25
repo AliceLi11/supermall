@@ -1,166 +1,170 @@
 <template>
-    <div class="wrap" ref="wrap">
-      <div class="content">
+  <div id="category">
+    <nav-bar class="category-nav">
+      <template v-slot:center>商品分类</template>
+    </nav-bar>
+    <div class="content">
+      <tab-menu :categories="categories" @selectItem="selectItem"></tab-menu>
+      <scroll id="tab-content" ref="scroll">
+        <div>
+          <tab-content-category :subcategories="showSubcategory"></tab-content-category>
+          <tab-control :titles="['综合','新品','销量']" @tabClick="tabClick"></tab-control>
+          <tab-content-detail :category-detail="showCategoryDetail"></tab-content-detail>
+        </div>
         <ul>
-          <!-- 1.无论是否设置click:false,button都可以点击 -->
-          <!-- <input type="button" value="点击" @click="btnClick"> -->
-          <!-- 2.必须设置click:true,那么div才能监听点击 -->
-          <div @click="btnClick">111</div>
-          <li>列表1</li>
-          <li>列表2</li>
-          <li>列表3</li>
-          <li>列表4</li>
-          <li>列表5</li>
-          <li>列表6</li>
-          <li>列表7</li>
-          <li>列表8</li>
-          <li>列表9</li>
-          <li>列表10</li>
-          <li>列表11</li>
-          <li>列表12</li>
-          <li>列表13</li>
-          <li>列表14</li>
-          <li>列表15</li>
-          <li>列表16</li>
-          <li>列表17</li>
-          <li>列表18</li>
-          <li>列表19</li>
-          <li>列表20</li>
-          <li>列表21</li>
-          <li>列表22</li>
-          <li>列表23</li>
-          <li>列表24</li>
-          <li>列表25</li>
-          <li>列表26</li>
-          <li>列表27</li>
-          <li>列表28</li>
-          <li>列表29</li>
-          <li>列表30</li>
-          <li>列表31</li>
-          <li>列表32</li>
-          <li>列表33</li>
-          <li>列表34</li>
-          <li>列表35</li>
-          <li>列表36</li>
-          <li>列表37</li>
-          <li>列表38</li>
-          <li>列表39</li>
-          <li>列表40</li>
-          <li>列表41</li>
-          <li>列表42</li>
-          <li>列表43</li>
-          <li>列表44</li>
-          <li>列表45</li>
-          <li>列表46</li>
-          <li>列表47</li>
-          <li>列表48</li>
-          <li>列表49</li>
-          <li>列表50</li>
-          <li>列表51</li>
-          <li>列表52</li>
-          <li>列表53</li>
-          <li>列表54</li>
-          <li>列表55</li>
-          <li>列表56</li>
-          <li>列表57</li>
-          <li>列表58</li>
-          <li>列表59</li>
-          <li>列表60</li>
-          <li>列表61</li>
-          <li>列表62</li>
-          <li>列表63</li>
-          <li>列表64</li>
-          <li>列表65</li>
-          <li>列表66</li>
-          <li>列表67</li>
-          <li>列表68</li>
-          <li>列表69</li>
-          <li>列表70</li>
-          <li>列表71</li>
-          <li>列表72</li>
-          <li>列表73</li>
-          <li>列表74</li>
-          <li>列表75</li>
-          <li>列表76</li>
-          <li>列表77</li>
-          <li>列表78</li>
-          <li>列表79</li>
-          <li>列表80</li>
-          <li>列表81</li>
-          <li>列表82</li>
-          <li>列表83</li>
-          <li>列表84</li>
-          <li>列表85</li>
-          <li>列表86</li>
-          <li>列表87</li>
-          <li>列表88</li>
-          <li>列表89</li>
-          <li>列表90</li>
-          <li>列表91</li>
-          <li>列表92</li>
-          <li>列表93</li>
-          <li>列表94</li>
-          <li>列表95</li>
-          <li>列表96</li>
-          <li>列表97</li>
-          <li>列表98</li>
-          <li>列表99</li>
-          <li>列表100</li>
+          <li>1111</li>
+          <li>2111</li>
+          <li>3111</li>
+          <li>4111</li>
+          <li>5111</li>
+          <li>6111</li>
+          <li>7111</li>
+          <li>8111</li>
+          <li>9111</li>
+          <li>10111</li>
         </ul>
-      </div>
+      </scroll>
     </div>
+  </div>
 </template>
 
 <script>
-/**
- * better-scroll官方文档https://better-scroll.github.io/docs/zh-CN/guide/base-scroll-options.html#probetype
-*/ 
-  import BScroll from "@better-scroll/core"
-  import Pullup from '@better-scroll/pull-up'
-  BScroll.use(Pullup);
-  export default {
-    name:"category",
-    data(){
-      return{
-        scroll:null
+import TabMenu from "./childComps/TabMenu"
+import TabContentCategory from "./childComps/TabContentCategory"
+import TabContentDetail from "./childComps/TabContentDetail"
+
+import NavBar from "components/common/navbar/NavBar"
+import Scroll from "components/common/scroll/Scroll"
+import TabControl from "components/content/tabControl/TabControl"
+
+import {getCategory,getSubcategory,getCategoryDetail} from "network/category"
+
+import {POP,NEW,SELL} from "common/const"
+import {itemListenerMixin} from "common/mixin"
+export default {
+  name:"Category",
+  components:{
+    TabMenu,
+    TabContentCategory,
+    TabContentDetail,
+    NavBar,
+    Scroll,
+    TabControl
+  },
+  mixins:[itemListenerMixin],
+  data(){
+    return {
+      categories:[],
+      categoryData:{},
+      currentIndex:-1,
+      currentType:POP
+    }
+  },
+  created(){
+    this._getCategory();
+  },
+  computed:{
+    showSubcategory(){
+      if(this.currentIndex === -1){
+        return {}
+      }else{
+        return this.categoryData[this.currentIndex].subcategories;
       }
     },
-    mounted(){
-      this.scroll = new BScroll(this.$refs.wrap,{
-        click:true,//如果是button的话，设置为false也能点击，但是其他普通元素此属性必须设置为true才能触发事件
-        probeType:3,//实时监听滚动位置
-        pullUpLoad:true//开启上拉加载,测试发现，如果开启了上拉加载，就会实时监听滚动位置
-      }),
-       
-      // 默认情况下BeScroll是不会实时监听滚动位置，所以要加个probeType属性，这个属性值有0/1/2/3
-      this.scroll.on('scroll',(position)=>{
-        console.log(position)
-      })
-
-      this.scroll.on('pullingUp',()=>{
-        console.log("上拉加载更多");
-        //发送网络请求，请求更多页的数据
-
-        //等数据请求完成，并且将新的数据展示出来后
-        setTimeout(()=>{
-          //结束上拉加载行为。每次触发 pullingUp 钩子后，你应该主动调用 finishPullUp() 告诉 BetterScroll 准备好下一次的 pullingUp 钩子。
-          //箭头函数可以让setTimeout里面的this，绑定定义时所在的作用域，而不是指向运行时所在的作用域。如果这里是普通函数，this指向的是window
-          this.scroll.finishPullUp()
-        },3000)
+    showCategoryDetail(){
+      if(this.currentIndex === -1){
+        return []
+      }else{
+        return this.categoryData[this.currentIndex].categoryDetail[this.currentType];
+      }
+    }
+  },
+  deactivated(){
+    //取消全局事件的监听，不能只传一个事件，一定要把监听的函数也加上，不然所有监听了这个事件的地方全被取消了
+    this.$bus.$off('itemImgLoaded',this.itemImgListener)
+  },
+  methods:{
+    _getCategory(){
+      getCategory().then(res=>{
+        console.log(res);
+        //1.获取分类数据
+        this.categories = res.data.category.list;
+        //初始化每个类别的子数据
+        for(var i = 0; i < this.categories.length; i++){
+          this.categoryData[i] = {
+            subcategories:{},
+            categoryDetail:{
+              'pop':[],
+              'new':[],
+              'sell':[]
+            }
+          }
+        }
+        this. _getSubcategories(0);
       })
     },
-    methods:{
-      btnClick(){
-        console.log("点击按钮了");
+    _getSubcategories(index){
+      this.currentIndex = index;
+      let maitKey = this.categories[index].maitKey;
+      getSubcategory(maitKey).then(res=>{
+        this.categoryData[index].subcategories = res.data;
+        this.categoryData = {...this.categoryData};
+        this._getCategoryDetail(POP);
+        this._getCategoryDetail(NEW);
+        this._getCategoryDetail(SELL);
+      })
+    },
+    _getCategoryDetail(type){
+      //1.获取请求的miniWallKey
+      let miniWallKey = this.categories[this.currentIndex].miniWallkey;
+      //2.发送请求，传入miniWallKey和tyPe
+      getCategoryDetail(miniWallKey,type).then(res=>{
+        console.log(res);
+        //3.将获取的数据保存下来
+        this.categoryData[this.currentIndex].categoryDetail[type] = res;
+        this.categoryData = {...this.categoryData};
+      })
+    },
+    /**
+     * 事件响应的相关方法
+     */
+    selectItem(index){
+      this._getSubcategories(index);
+    },
+    tabClick(index){
+      if(index===0){
+        this.currentType = POP;
+      }else if(index===1){
+        this.currentType = NEW;
+      }else if(index===2){
+        this.currentType = SELL;
       }
     }
   }
+}
 </script>
 
 <style scoped>
-  .wrap{
-    height: 150px;
-    background: seagreen;
-    /* overflow: hidden; */
+  #category{
+    height:100vh;
+  }
+  .category-nav{
+    background: var(--color-tint);
+    color: #fff;
+    /* position: relative;
+    z-index:9; */
+  }
+  .content{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 44px;
+    bottom: 49px;
+    display: flex;
+    overflow: hidden;
+  }
+  #tab-content{
+    flex:1;
+    height:100%;
   }
 </style>
