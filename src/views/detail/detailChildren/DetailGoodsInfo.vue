@@ -28,8 +28,11 @@ export default {
   },
   methods:{
     imgLoad(){
-      //判断，所有的图片都加载完了，那么进行一次回调就可以了
-      if(++this.counter===this.imagesLength){
+      //判断，所有的图片都加载完了，那么进行一次回调就可以了(这里一些链接有问题，所以图片不会相等)
+      // if(++this.counter===this.imagesLength){
+      //   this.$emit("imageLoadEnd");
+      // }
+      if(++this.counter===3){
         this.$emit("imageLoadEnd");
       }
     }
